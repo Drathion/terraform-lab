@@ -19,15 +19,21 @@ locals {
     "b" = "10.10.2.0/24"
     "c" = "10.10.3.0/24"
   })
+  
+  default_tags = tomap({
+    "project" = "terraform-lab"
+  })
 }
 
 resource "aws_vpc" "practice-vpc" {
     cidr_block = "10.10.0.0/16"
 
-    tags = {
-      "tf-project" = "terraform-lab"
-      "Name" = "terraform-lab" # Name is the default "AWS Name" tag. Case sensitive
-    }
+    tags = merge (
+      local.default_tags,
+      {
+        Name = "terraform-lab"
+      }
+    )
 }
 
 resource "aws_subnet" "terraform-lab-subnet-private" {
@@ -35,9 +41,19 @@ resource "aws_subnet" "terraform-lab-subnet-private" {
   vpc_id = aws_vpc.practice-vpc.id
   cidr_block = each.value
 
-  tags = {
-    "Name" = each.key
-    "tf-project" = "terraform-lab"
-  }
+  tags = merge(
+    local.default_tags,
+    {
+      Name = "terraform-lab"
+    }
+  )
+}
+
+output "subnets" {
+  value = { for key, subnet in local.subnet_blocks : key => local.subnet_blocks[key] }
+}
+
+output "vpc_cidr" {
+  value = aws_vpc.practice-vpc.cidr_block
 }
 
