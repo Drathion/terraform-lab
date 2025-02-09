@@ -37,7 +37,7 @@ resource "aws_subnet" "terraform-lab-subnet-private" {
 
   tags = {
     "Name" = each.key
-    "tf-project" = "aws-practice"
+    "tf-project" = "terraform-lab"
   }
 }
 
